@@ -48,6 +48,32 @@ export async function getRecentDonations(limit = 30): Promise<DonationQueryResul
   };
 }
 
+export async function getDonationById(id: string): Promise<{ donation: Donation | null; error: string | null }> {
+  if (!hasSupabaseConfig()) {
+    return {
+      donation: null,
+      error: "Supabaseの環境変数が設定されていません。"
+    };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("donations")
+    .select("*, profile:users(nickname, instagram_id, avatar_url)")
+    .eq("id", id)
+    .eq("is_deleted", false)
+    .maybeSingle();
+
+  if (error) {
+    return { donation: null, error: error.message };
+  }
+
+  return {
+    donation: data ? mapDonationRow(data as DonationRow) : null,
+    error: null
+  };
+}
+
 export async function getDonationStats(): Promise<{ stats: DonationStats; error: string | null }> {
   if (!hasSupabaseConfig()) {
     return {

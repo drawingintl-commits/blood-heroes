@@ -73,7 +73,7 @@ create table public.reports (
 );
 
 insert into public.badges (threshold, title, description, color) values
-  (1, 'はじめてヒーロー', 'はじめての一歩に、心からありがとう。', 'rose'),
+  (1, '初ヒーロー', 'はじめての一歩に、心からありがとう。', 'rose'),
   (5, 'いのちの応援者', '継続するやさしさが誰かの支えに。', 'red'),
   (10, '赤のヒーロー', '献血文化を広げる頼れる存在。', 'red'),
   (30, '金の献血者', '地域にあたたかい循環を作る人。', 'gold'),

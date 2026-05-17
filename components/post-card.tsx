@@ -1,4 +1,5 @@
 import { CalendarDays, Heart, MapPin, MessageCircle } from "lucide-react";
+import Link from "next/link";
 import { BadgePill } from "@/components/badge-pill";
 import { donationTypeLabel, formatDateLabel, getRemainingDays } from "@/lib/donations";
 import type { Donation } from "@/types/database";
@@ -71,6 +72,9 @@ export function PostCard({ donation }: { donation: Donation }) {
             <MessageCircle size={18} aria-hidden />
             応援する
           </span>
+          <Link className="text-hero-red" href={`/donations/${donation.id}`}>
+            共有ページ
+          </Link>
         </div>
       </div>
     </article>

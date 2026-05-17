@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarHeart, Camera, Loader2, MapPin, PartyPopper } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/button";
 import { DonationStoryCard } from "@/components/donation-story-card";
@@ -34,6 +34,9 @@ export function DonationForm({
   const [comment, setComment] = useState("今日の1回が、誰かの未来になりますように。");
   const [isFirstDonation, setIsFirstDonation] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const [savedPhotoUrl, setSavedPhotoUrl] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
 
@@ -41,6 +44,18 @@ export function DonationForm({
     () => calculateNextAvailableDate(donatedOn, donationType),
     [donatedOn, donationType]
   );
+
+  useEffect(() => {
+    if (!photoFile) {
+      setPhotoPreviewUrl(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(photoFile);
+    setPhotoPreviewUrl(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [photoFile]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -77,13 +92,15 @@ export function DonationForm({
         })
       });
 
-      const result = (await response.json()) as { error?: string };
+      const result = (await response.json()) as { donation?: { id: string; photo_url: string | null }; error?: string };
       if (!response.ok) {
         throw new Error(result.error ?? "投稿の保存に失敗しました。");
       }
 
+      setSavedPhotoUrl(result.donation?.photo_url ?? photoUrl);
+      setShareUrl(result.donation?.id ? `${window.location.origin}/donations/${result.donation.id}` : null);
       setStatus("success");
-      setMessage("投稿を保存しました。ありがとう！称賛カードもダウンロードできます。");
+      setMessage("投稿を保存しました。画像保存やSNS共有ができます。");
       router.refresh();
     } catch (error) {
       setStatus("error");
@@ -272,10 +289,13 @@ export function DonationForm({
 
       <div className="space-y-4">
         <DonationStoryCard
+          comment={comment}
           count={count}
           donatedOn={donatedOn}
           nickname={nickname || "あなた"}
+          photoUrl={photoVisibility === "count_only" ? null : photoPreviewUrl ?? savedPhotoUrl}
           region={region || "地域"}
+          shareUrl={shareUrl}
         />
       </div>
     </div>

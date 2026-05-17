@@ -4,7 +4,7 @@ export const badges: Badge[] = [
   {
     id: "first-hero",
     threshold: 1,
-    title: "はじめてヒーロー",
+    title: "初ヒーロー",
     description: "はじめての一歩に、心からありがとう。",
     color: "bg-rose-100 text-hero-deep"
   },
