@@ -13,15 +13,26 @@ export function PostCard({ donation }: { donation: Donation }) {
           {donation.profile?.nickname?.slice(0, 1).toUpperCase() ?? "H"}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold">{donation.profile?.nickname ?? "Blood Hero"}</p>
+          <p className="truncate text-sm font-bold">{donation.profile?.nickname ?? "献血ヒーロー"}</p>
           <p className="truncate text-xs text-stone-500">
             {donation.profile?.instagram_id ? `@${donation.profile.instagram_id}` : "Instagram未連携"}
           </p>
         </div>
         <BadgePill count={donation.count} />
       </div>
-      <div className="aspect-square bg-gradient-to-br from-hero-soft via-white to-mint p-5">
-        <div className="flex h-full flex-col justify-between rounded-lg border border-white/70 bg-white/80 p-5 shadow-sm">
+      <div
+        className="aspect-square bg-gradient-to-br from-hero-soft via-white to-mint p-5"
+        style={
+          donation.photo_url && donation.photo_visibility !== "count_only"
+            ? {
+                backgroundImage: `linear-gradient(rgba(255, 241, 242, 0.6), rgba(233, 251, 247, 0.72)), url(${donation.photo_url})`,
+                backgroundPosition: "center",
+                backgroundSize: "cover"
+              }
+            : undefined
+        }
+      >
+        <div className="flex h-full flex-col justify-between rounded-lg border border-white/70 bg-white/85 p-5 shadow-sm backdrop-blur-[2px]">
           <div>
             <p className="text-sm font-semibold text-hero-red">献血してくれてありがとう</p>
             <h2 className="mt-2 text-4xl font-black text-hero-ink">献血{donation.count}回目</h2>

@@ -1,11 +1,20 @@
+import { EmptyState } from "@/components/empty-state";
+import { ErrorNotice } from "@/components/error-notice";
 import { ArrowRight, HeartHandshake, Instagram, ShieldCheck, Sparkles } from "lucide-react";
 import { LinkButton } from "@/components/button";
 import { InstagramGrid } from "@/components/instagram-grid";
 import { PostCard } from "@/components/post-card";
 import { StatCard } from "@/components/stat-card";
-import { demoDonations, stats } from "@/lib/mock-data";
+import { getDonationStats, getRecentDonations } from "@/lib/supabase/queries";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const [{ donations, error: donationsError }, { stats, error: statsError }] = await Promise.all([
+    getRecentDonations(6),
+    getDonationStats()
+  ]);
+
   return (
     <div>
       <section className="bg-white">
@@ -39,7 +48,9 @@ export default function HomePage() {
             </div>
             <div className="flex h-full flex-col justify-end rounded-[22px] border border-white/30 bg-white/15 p-6 backdrop-blur-sm">
               <p className="text-sm font-bold opacity-90">今日の献血ヒーロー</p>
-              <h2 className="mt-3 text-5xl font-black">献血12回目</h2>
+              <h2 className="mt-3 text-5xl font-black">
+                献血{donations[0]?.count ?? 1}回目
+              </h2>
               <p className="mt-4 rounded-lg bg-white px-4 py-3 text-lg font-black text-hero-deep">
                 あなたの行動が、誰かの命につながる
               </p>
@@ -49,6 +60,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-8">
+        {statsError ? <ErrorNotice message={statsError} title="統計の読み込みに失敗しました" /> : null}
         <div className="grid gap-3 sm:grid-cols-3">
           <StatCard label="累計献血回数" value={stats.totalDonations.toLocaleString()} />
           <StatCard label="累計参加人数" value={stats.totalMembers.toLocaleString()} tone="mint" />
@@ -70,11 +82,20 @@ export default function HomePage() {
               もっと見る
             </LinkButton>
           </div>
-          <div className="grid gap-5">
-            {demoDonations.slice(0, 2).map((donation) => (
-              <PostCard donation={donation} key={donation.id} />
-            ))}
-          </div>
+          {donationsError ? <ErrorNotice message={donationsError} /> : null}
+          {!donationsError && donations.length === 0 ? (
+            <EmptyState
+              title="まだ投稿がありません"
+              message="Supabaseに投稿が保存されると、TOPにも最近の献血記録が表示されます。"
+            />
+          ) : null}
+          {donations.length > 0 ? (
+            <div className="grid gap-5">
+              {donations.slice(0, 2).map((donation) => (
+                <PostCard donation={donation} key={donation.id} />
+              ))}
+            </div>
+          ) : null}
         </div>
         <div>
           <p className="inline-flex items-center gap-2 text-sm font-bold text-hero-red">
@@ -83,7 +104,7 @@ export default function HomePage() {
           </p>
           <h2 className="mt-2 text-2xl font-black">シェアしたくなる献血カード</h2>
           <div className="mt-4">
-            <InstagramGrid />
+            <InstagramGrid donations={donations} />
           </div>
         </div>
       </section>

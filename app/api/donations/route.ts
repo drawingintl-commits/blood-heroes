@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { calculateNextAvailableDate } from "@/lib/donations";
+import { hasSupabaseConfig } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 
 const donationSchema = z.object({
+  nickname: z.string().min(1).max(40),
+  instagram_id: z.string().max(40).nullable().optional(),
   count: z.number().int().positive(),
   donated_on: z.string().date(),
   donation_type: z.enum(["whole_blood_200", "whole_blood_400", "plasma", "platelet"]),
@@ -16,6 +19,10 @@ const donationSchema = z.object({
 });
 
 export async function GET() {
+  if (!hasSupabaseConfig()) {
+    return NextResponse.json({ error: "Supabaseの環境変数が設定されていません" }, { status: 500 });
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("donations")
@@ -32,6 +39,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!hasSupabaseConfig()) {
+    return NextResponse.json({ error: "Supabaseの環境変数が設定されていません" }, { status: 500 });
+  }
+
   const payload = donationSchema.safeParse(await request.json());
 
   if (!payload.success) {
@@ -54,10 +65,26 @@ export async function POST(request: Request) {
     .toISOString()
     .slice(0, 10);
 
+  const { nickname, instagram_id, ...donationPayload } = payload.data;
+  const { error: profileError } = await supabase.from("users").upsert(
+    {
+      id: user.id,
+      nickname,
+      instagram_id: instagram_id || null,
+      region: donationPayload.region,
+      total_donations: donationPayload.count
+    },
+    { onConflict: "id" }
+  );
+
+  if (profileError) {
+    return NextResponse.json({ error: profileError.message }, { status: 500 });
+  }
+
   const { data, error } = await supabase
     .from("donations")
     .insert({
-      ...payload.data,
+      ...donationPayload,
       user_id: user.id,
       next_available_on: nextAvailableOn
     })

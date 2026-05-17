@@ -1,35 +1,101 @@
 "use client";
 
-import { CalendarHeart, Camera, MapPin, PartyPopper } from "lucide-react";
+import { CalendarHeart, Camera, Loader2, MapPin, PartyPopper } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/button";
 import { DonationStoryCard } from "@/components/donation-story-card";
 import { calculateNextAvailableDate, formatDateLabel, getRemainingDays } from "@/lib/donations";
+import { createClient } from "@/lib/supabase/browser";
 import type { DonationType, PhotoVisibility } from "@/types/database";
 
-export function DonationForm() {
+type DonationFormProps = {
+  initialNickname?: string;
+  initialInstagramId?: string | null;
+  initialRegion?: string;
+  isLoggedIn: boolean;
+};
+
+export function DonationForm({
+  initialNickname = "あなた",
+  initialInstagramId = "",
+  initialRegion = "東京都",
+  isLoggedIn
+}: DonationFormProps) {
+  const router = useRouter();
   const [count, setCount] = useState(1);
-  const [nickname, setNickname] = useState("あなた");
-  const [region, setRegion] = useState("東京都");
+  const [nickname, setNickname] = useState(initialNickname);
+  const [instagramId, setInstagramId] = useState(initialInstagramId ?? "");
+  const [region, setRegion] = useState(initialRegion);
+  const [location, setLocation] = useState("");
   const [donatedOn, setDonatedOn] = useState(new Date().toISOString().slice(0, 10));
   const [donationType, setDonationType] = useState<DonationType>("whole_blood_400");
   const [photoVisibility, setPhotoVisibility] = useState<PhotoVisibility>("count_only");
   const [comment, setComment] = useState("今日の1回が、誰かの未来になりますように。");
-  const [posted, setPosted] = useState(false);
+  const [isFirstDonation, setIsFirstDonation] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [message, setMessage] = useState<string | null>(null);
 
   const nextAvailableOn = useMemo(
     () => calculateNextAvailableDate(donatedOn, donationType),
     [donatedOn, donationType]
   );
 
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus("saving");
+    setMessage(null);
+
+    try {
+      if (!isLoggedIn) {
+        throw new Error("投稿するにはログインが必要です。");
+      }
+
+      let photoUrl: string | null = null;
+      if (photoFile) {
+        photoUrl = await uploadDonationPhoto(photoFile);
+      }
+
+      const response = await fetch("/api/donations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nickname,
+          instagram_id: instagramId || null,
+          count,
+          donated_on: donatedOn,
+          donation_type: donationType,
+          location,
+          region,
+          comment,
+          photo_url: photoUrl,
+          photo_visibility: photoVisibility,
+          is_first_donation: isFirstDonation
+        })
+      });
+
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(result.error ?? "投稿の保存に失敗しました。");
+      }
+
+      setStatus("success");
+      setMessage("投稿を保存しました。ありがとう！称賛カードもダウンロードできます。");
+      router.refresh();
+    } catch (error) {
+      setStatus("error");
+      setMessage(error instanceof Error ? error.message : "予期しないエラーが発生しました。");
+    }
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_420px]">
       <form
         className="space-y-5 rounded-lg border border-rose-100 bg-white p-5"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setPosted(true);
-        }}
+        onSubmit={handleSubmit}
       >
         <div>
           <p className="inline-flex items-center gap-2 rounded-full bg-hero-soft px-3 py-1 text-xs font-bold text-hero-deep">
@@ -50,6 +116,15 @@ export function DonationForm() {
               onChange={(event) => setNickname(event.target.value)}
               required
               value={nickname}
+            />
+          </label>
+          <label className="space-y-2">
+            <span className="text-sm font-bold">Instagram ID（任意）</span>
+            <input
+              className="w-full rounded-lg border border-stone-200 px-3 py-3 outline-none focus:border-hero-red"
+              onChange={(event) => setInstagramId(event.target.value)}
+              placeholder="blood_hero"
+              value={instagramId}
             />
           </label>
           <label className="space-y-2">
@@ -82,6 +157,16 @@ export function DonationForm() {
               value={region}
             />
           </label>
+          <label className="space-y-2">
+            <span className="text-sm font-bold">場所</span>
+            <input
+              className="w-full rounded-lg border border-stone-200 px-3 py-3 outline-none focus:border-hero-red"
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="渋谷献血ルーム"
+              required
+              value={location}
+            />
+          </label>
         </div>
 
         <label className="space-y-2">
@@ -105,6 +190,16 @@ export function DonationForm() {
             onChange={(event) => setComment(event.target.value)}
             value={comment}
           />
+        </label>
+
+        <label className="flex items-center gap-3 rounded-lg bg-hero-soft px-4 py-3 text-sm font-bold text-hero-deep">
+          <input
+            checked={isFirstDonation}
+            className="h-4 w-4 accent-hero-red"
+            onChange={(event) => setIsFirstDonation(event.target.checked)}
+            type="checkbox"
+          />
+          初献血として投稿する
         </label>
 
         <div className="space-y-3">
@@ -134,8 +229,13 @@ export function DonationForm() {
 
         <label className="flex min-h-28 cursor-pointer items-center justify-center gap-3 rounded-lg border border-dashed border-rose-200 bg-hero-soft text-sm font-bold text-hero-deep">
           <Camera size={20} aria-hidden />
-          写真をアップロード
-          <input accept="image/*" className="sr-only" type="file" />
+          {photoFile ? photoFile.name : "写真をアップロード"}
+          <input
+            accept="image/*"
+            className="sr-only"
+            onChange={(event) => setPhotoFile(event.target.files?.[0] ?? null)}
+            type="file"
+          />
         </label>
 
         <div className="grid gap-3 rounded-lg bg-mint p-4 text-teal-900 sm:grid-cols-2">
@@ -148,9 +248,25 @@ export function DonationForm() {
           </p>
         </div>
 
-        <Button className="w-full" type="submit">
-          <MapPin size={18} aria-hidden />
-          投稿して称賛カードを作る
+        {!isLoggedIn ? (
+          <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-bold text-red-800">
+            Supabaseログイン後に投稿できます。ログインページからGoogleまたはメールでログインしてください。
+          </p>
+        ) : null}
+
+        {message ? (
+          <p
+            className={`rounded-lg px-4 py-3 text-sm font-bold ${
+              status === "error" ? "bg-red-50 text-red-800" : "bg-mint text-teal-900"
+            }`}
+          >
+            {message}
+          </p>
+        ) : null}
+
+        <Button className="w-full" disabled={!isLoggedIn || status === "saving"} type="submit">
+          {status === "saving" ? <Loader2 className="animate-spin" size={18} aria-hidden /> : <MapPin size={18} aria-hidden />}
+          {status === "saving" ? "保存中..." : "投稿して称賛カードを作る"}
         </Button>
       </form>
 
@@ -161,12 +277,35 @@ export function DonationForm() {
           nickname={nickname || "あなた"}
           region={region || "地域"}
         />
-        {posted ? (
-          <p className="rounded-lg bg-hero-soft px-4 py-3 text-sm font-bold text-hero-deep">
-            ありがとう！このMVPではデモ投稿としてカード生成まで確認できます。Supabase接続後は投稿保存されます。
-          </p>
-        ) : null}
       </div>
     </div>
   );
+}
+
+async function uploadDonationPhoto(file: File) {
+  const supabase = createClient();
+  const {
+    data: { user },
+    error: userError
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    throw new Error("画像をアップロードするにはログインが必要です。");
+  }
+
+  const extension = file.name.split(".").pop() ?? "jpg";
+  const safeName = `${crypto.randomUUID()}.${extension.toLowerCase()}`;
+  const path = `${user.id}/${safeName}`;
+
+  const { error } = await supabase.storage.from("donation-photos").upload(path, file, {
+    cacheControl: "3600",
+    upsert: false
+  });
+
+  if (error) {
+    throw new Error(`画像アップロードに失敗しました: ${error.message}`);
+  }
+
+  const { data } = supabase.storage.from("donation-photos").getPublicUrl(path);
+  return data.publicUrl;
 }

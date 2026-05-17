@@ -35,7 +35,7 @@ Open `http://localhost:3000`.
 
 ## Environment Variables
 
-ローカル開発ではプロジェクトルートに環境変数ファイルを作成し、以下を設定してください。実際の値はSupabaseのProject Settingsから取得します。
+ローカル開発ではプロジェクトルートに `.env.local` を作成し、以下を設定してください。実際の値はSupabaseのProject Settingsから取得します。
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url

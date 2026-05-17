@@ -1,11 +1,17 @@
+import { EmptyState } from "@/components/empty-state";
+import { ErrorNotice } from "@/components/error-notice";
 import { PostCard } from "@/components/post-card";
-import { demoDonations } from "@/lib/mock-data";
+import { getRecentDonations } from "@/lib/supabase/queries";
 
 export const metadata = {
   title: "投稿一覧"
 };
 
-export default function FeedPage() {
+export const dynamic = "force-dynamic";
+
+export default async function FeedPage() {
+  const { donations, error } = await getRecentDonations(30);
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <div className="mb-6">
@@ -15,11 +21,20 @@ export default function FeedPage() {
           回数の多さだけでなく、はじめての1回も同じように称えます。
         </p>
       </div>
-      <div className="grid gap-5">
-        {demoDonations.map((donation) => (
-          <PostCard donation={donation} key={donation.id} />
-        ))}
-      </div>
+      {error ? <ErrorNotice message={error} /> : null}
+      {!error && donations.length === 0 ? (
+        <EmptyState
+          title="まだ投稿がありません"
+          message="最初の献血記録が投稿されると、ここに称賛のフィードが流れます。"
+        />
+      ) : null}
+      {donations.length > 0 ? (
+        <div className="grid gap-5">
+          {donations.map((donation) => (
+            <PostCard donation={donation} key={donation.id} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
