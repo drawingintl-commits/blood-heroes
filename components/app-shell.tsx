@@ -3,10 +3,10 @@ import type { ReactNode } from "react";
 import { HeartHandshake, Home, PlusCircle, ShieldCheck, UserRound } from "lucide-react";
 
 const navItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/feed", label: "Feed", icon: HeartHandshake },
-  { href: "/donations/new", label: "Post", icon: PlusCircle },
-  { href: "/login", label: "Login", icon: UserRound }
+  { href: "/", label: "ホーム", icon: Home },
+  { href: "/feed", label: "投稿", icon: HeartHandshake },
+  { href: "/donations/new", label: "記録", icon: PlusCircle },
+  { href: "/login", label: "ログイン", icon: UserRound }
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-hero-red text-white">
               <ShieldCheck size={20} aria-hidden />
             </span>
-            <span>Blood Heroes</span>
+            <span>献血ヒーローズ</span>
           </Link>
           <nav className="hidden items-center gap-2 md:flex">
             {navItems.map((item) => (

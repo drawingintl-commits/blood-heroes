@@ -9,7 +9,7 @@ export default function FeedPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <div className="mb-6">
-        <p className="text-sm font-bold text-hero-red">Community Feed</p>
+        <p className="text-sm font-bold text-hero-red">コミュニティ投稿</p>
         <h1 className="mt-2 text-3xl font-black">献血ヒーローの投稿</h1>
         <p className="mt-3 text-sm leading-6 text-stone-600">
           回数の多さだけでなく、はじめての1回も同じように称えます。

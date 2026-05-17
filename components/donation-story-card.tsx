@@ -38,7 +38,7 @@ export function DonationStoryCard({ nickname, region, count, donatedOn }: StoryC
 
     context.fillStyle = "#df2f3f";
     context.font = "700 54px sans-serif";
-    context.fillText("Blood Heroes", 140, 290);
+    context.fillText("献血ヒーローズ", 140, 290);
 
     context.fillStyle = "#2d1f24";
     context.font = "900 138px sans-serif";
@@ -80,11 +80,11 @@ export function DonationStoryCard({ nickname, region, count, donatedOn }: StoryC
         ref={cardRef}
       >
         <div className="flex items-center justify-between">
-          <p className="text-sm font-bold">Blood Heroes</p>
+          <p className="text-sm font-bold">献血ヒーローズ</p>
           <Sparkles size={22} aria-hidden />
         </div>
         <div>
-          <p className="text-sm font-semibold opacity-90">Thank you for donating</p>
+          <p className="text-sm font-semibold opacity-90">献血してくれてありがとう</p>
           <h2 className="mt-3 text-5xl font-black leading-tight">献血{count}回目</h2>
           <p className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-bold text-hero-deep">
             {badge.title}

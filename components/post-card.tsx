@@ -23,7 +23,7 @@ export function PostCard({ donation }: { donation: Donation }) {
       <div className="aspect-square bg-gradient-to-br from-hero-soft via-white to-mint p-5">
         <div className="flex h-full flex-col justify-between rounded-lg border border-white/70 bg-white/80 p-5 shadow-sm">
           <div>
-            <p className="text-sm font-semibold text-hero-red">Thank you for donating</p>
+            <p className="text-sm font-semibold text-hero-red">献血してくれてありがとう</p>
             <h2 className="mt-2 text-4xl font-black text-hero-ink">献血{donation.count}回目</h2>
             {donation.is_first_donation ? (
               <p className="mt-3 inline-flex rounded-full bg-hero-red px-3 py-1 text-xs font-bold text-white">

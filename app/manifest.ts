@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Blood Heroes",
-    short_name: "BloodHeroes",
+    name: "献血ヒーローズ",
+    short_name: "献血ヒーローズ",
     description: "献血者を称賛するSNS型コミュニティ",
     start_url: "/",
     display: "standalone",

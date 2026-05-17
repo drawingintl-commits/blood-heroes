@@ -19,7 +19,7 @@ export default function HomePage() {
               あなたの1回が、誰かの未来になる。
             </h1>
             <p className="mt-5 max-w-xl text-base leading-8 text-stone-600">
-              Blood Heroesは、献血回数を誇れるカードに変え、善意を地域へ広げる場所です。
+              献血ヒーローズは、献血回数を誇れるカードに変え、善意を地域へ広げる場所です。
               競争ではなく、ありがとうが集まるコミュニティを目指します。
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -34,11 +34,11 @@ export default function HomePage() {
           </div>
           <div className="relative min-h-[520px] overflow-hidden rounded-[28px] bg-gradient-to-br from-hero-red via-rose-400 to-hero-soft p-5 text-white shadow-glow">
             <div className="absolute inset-x-6 top-6 flex items-center justify-between">
-              <span className="text-sm font-bold">Blood Heroes</span>
+              <span className="text-sm font-bold">献血ヒーローズ</span>
               <ShieldCheck size={24} aria-hidden />
             </div>
             <div className="flex h-full flex-col justify-end rounded-[22px] border border-white/30 bg-white/15 p-6 backdrop-blur-sm">
-              <p className="text-sm font-bold opacity-90">Today&apos;s Hero</p>
+              <p className="text-sm font-bold opacity-90">今日の献血ヒーロー</p>
               <h2 className="mt-3 text-5xl font-black">献血12回目</h2>
               <p className="mt-4 rounded-lg bg-white px-4 py-3 text-lg font-black text-hero-deep">
                 あなたの行動が、誰かの命につながる

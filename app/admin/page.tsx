@@ -10,7 +10,7 @@ export default function AdminPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6">
-        <p className="text-sm font-bold text-hero-red">Admin</p>
+        <p className="text-sm font-bold text-hero-red">管理</p>
         <h1 className="mt-2 text-3xl font-black">管理画面</h1>
         <p className="mt-3 text-sm text-stone-600">
           RLSと管理者フラグで保護する想定の管理ビューです。

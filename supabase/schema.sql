@@ -73,12 +73,12 @@ create table public.reports (
 );
 
 insert into public.badges (threshold, title, description, color) values
-  (1, 'First Hero', 'はじめての一歩に、心からありがとう。', 'rose'),
-  (5, 'Life Saver', '継続するやさしさが誰かの支えに。', 'red'),
-  (10, 'Red Hero', '献血文化を広げる頼れる存在。', 'red'),
-  (30, 'Gold Donor', '地域にあたたかい循環を作る人。', 'gold'),
-  (50, 'Legend Donor', '長く続ける善意は、ひとつの文化です。', 'black'),
-  (100, 'Blood Master', '称賛と感謝を込めて、最高位のヒーローへ。', 'purple')
+  (1, 'はじめてヒーロー', 'はじめての一歩に、心からありがとう。', 'rose'),
+  (5, 'いのちの応援者', '継続するやさしさが誰かの支えに。', 'red'),
+  (10, '赤のヒーロー', '献血文化を広げる頼れる存在。', 'red'),
+  (30, '金の献血者', '地域にあたたかい循環を作る人。', 'gold'),
+  (50, '伝説の献血者', '長く続ける善意は、ひとつの文化です。', 'black'),
+  (100, '献血マスター', '称賛と感謝を込めて、最高位のヒーローへ。', 'purple')
 on conflict (threshold) do nothing;
 
 alter table public.users enable row level security;

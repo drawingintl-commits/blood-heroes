@@ -8,7 +8,7 @@ export default function TermsPage() {
   return (
     <LegalPage title="利用規約">
       <p>
-        Blood Heroesは献血者を称賛し、献血文化を広げるための非公式コミュニティサービスです。
+        献血ヒーローズは献血者を称賛し、献血文化を広げるための非公式コミュニティサービスです。
         日本赤十字社その他公的機関の公式サービスではありません。
       </p>
       <p>
