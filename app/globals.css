@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fffdfa;
+  color: #2d1f24;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.story-card-gradient {
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.96), transparent 36%),
+    linear-gradient(145deg, #df2f3f 0%, #fb7185 50%, #fff1f2 100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .celebrate-pop {
+    animation: celebrate-pop 520ms ease both;
+  }
+
+  @keyframes celebrate-pop {
+    0% {
+      transform: translateY(10px) scale(0.96);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+}
