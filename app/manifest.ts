@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "献血ヒーローズ",
     short_name: "献血ヒーローズ",
-    description: "献血者を称賛するSNS型コミュニティ",
+    description: "献血を称え、善意を広げるSNSコミュニティ",
+    lang: "ja",
     start_url: "/",
     display: "standalone",
     background_color: "#fffdfa",
